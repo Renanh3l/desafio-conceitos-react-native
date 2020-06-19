@@ -32,10 +32,26 @@ export default function App() {
     }
   }
 
+  async function handleDeleteRepository(id) {
+    const response = await api.delete(`repositories/${id}`);
+
+    if (response.status === 204) {
+      const repoIndex = repos.findIndex((repo) => repo.id === id);
+      const newRepos = repos;
+      newRepos.splice(repoIndex, 1);
+      setRepos([...newRepos]);
+    }
+  }
+
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="#7159c1" />
+
       <SafeAreaView style={styles.container}>
+        <TouchableOpacity style={styles.fabRefresh}>
+          <Text>Refresh</Text>
+        </TouchableOpacity>
+        <Text style={styles.appTitle}>Meus Repositórios</Text>
         <FlatList
           data={repos}
           keyExtractor={(repo) => repo.id}
@@ -61,14 +77,24 @@ export default function App() {
                 </Text>
               </View>
 
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleLikeRepository(repo.id)}
-                // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
-                testID={`like-button-${repo.id}`}
-              >
-                <Text style={styles.buttonText}>Curtir</Text>
-              </TouchableOpacity>
+              <View style={styles.actionsContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleLikeRepository(repo.id)}
+                  // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
+                  testID={`like-button-${repo.id}`}
+                >
+                  <Text style={styles.buttonText}>Curtir</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.alertButton}
+                  onPress={() => handleDeleteRepository(repo.id)}
+                  // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
+                  testID={`like-button-${repo.id}`}
+                >
+                  <Text style={styles.buttonText}>Excluir</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         />
@@ -81,6 +107,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#7159c1",
+    position: "relative",
+  },
+  appTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#fff",
+    marginVertical: 16,
+  },
+  fabRefresh: {
+    backgroundColor: "#7159c1",
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    zIndex: 15,
+    shadowColor: "#000",
+    elevation: 5,
   },
   repositoryContainer: {
     marginBottom: 15,
@@ -115,15 +161,26 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: 10,
   },
+  actionsContainer: {
+    flexDirection: "row",
+  },
   button: {
+    flex: 1,
     marginTop: 10,
+    backgroundColor: "#7159c1",
+    marginRight: 8,
+  },
+  alertButton: {
+    flex: 1,
+    marginTop: 10,
+    backgroundColor: "red",
   },
   buttonText: {
     fontSize: 14,
     fontWeight: "bold",
     marginRight: 10,
     color: "#fff",
-    backgroundColor: "#7159c1",
     padding: 15,
+    textAlign: "center",
   },
 });
