@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "./services/api";
+import Icon from "react-native-vector-icons/MaterialIcons";
+Icon.loadFont();
 
 import {
   SafeAreaView,
@@ -15,13 +17,15 @@ export default function App() {
   const [repos, setRepos] = useState([]);
 
   useEffect(() => {
-    api.get("repositories").then((response) => {
-      setRepos(response.data);
-    });
+    api
+      .get("repositories")
+      .then((response) => {
+        setRepos(response.data);
+      })
+      .catch((error) => console.log(error));
   }, []);
 
   async function handleLikeRepository(id) {
-    // Implement "Like Repository" functionality
     const response = await api.post(`repositories/${id}/like`);
 
     if (response.status === 200) {
@@ -43,13 +47,21 @@ export default function App() {
     }
   }
 
+  async function handleUpdateRepositoriesList() {
+    const response = await api.get("repositories");
+    setRepos(response.data);
+  }
+
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="#7159c1" />
+      <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
 
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity style={styles.fabRefresh}>
-          <Text>Refresh</Text>
+        <TouchableOpacity
+          onPress={() => handleUpdateRepositoriesList()}
+          style={styles.fabRefresh}
+        >
+          <Icon name="refresh" size={40} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.appTitle}>Meus Repositórios</Text>
         <FlatList
@@ -117,7 +129,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   fabRefresh: {
-    backgroundColor: "#7159c1",
+    backgroundColor: "purple",
     borderRadius: 50,
     width: 60,
     height: 60,
@@ -127,6 +139,8 @@ const styles = StyleSheet.create({
     zIndex: 15,
     shadowColor: "#000",
     elevation: 5,
+    alignItems: "center",
+    justifyContent: "center",
   },
   repositoryContainer: {
     marginBottom: 15,
